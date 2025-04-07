@@ -72,8 +72,6 @@ __Deadlines:__  April 18th, 2025 at 11:59 PM EST (10 days from the release of th
 __Release Date:__  April 10th, 2025 at 11.59 PM EST. 
 __Late Due Date:__ May 10th, 2025 at 11.59 PM EST.
 
-__Submission Grading:__ Bonus points (+5) will be awarded for submissions that pass all the provided public test cases.
-
 
 ## :bar_chart: Evaluation:
 
@@ -88,6 +86,8 @@ __Submission Grading:__ Bonus points (+5) will be awarded for submissions that p
 - __Correctness:__ Does the implementation correctly handle all operations on the task collection?
 - __Efficiency:__ Does the implementation have a reasonable time and space complexity?
 - __Time Complexity:__ For full credit, each operation should take no more than O(N) time, where N is the number of characters in the word argument
+
+__Grading Bonus:__ Bonus points (+5) will be awarded for submissions that pass all the provided public test cases.
 
 ## :rocket: Starter Code
 
