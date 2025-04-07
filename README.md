@@ -68,7 +68,9 @@ For this assignment, you will submit your `Dictionary.java` file and any additio
 __Submission link:__ [https://www.gradescope.com/courses/965721/assignments/6050536](https://www.gradescope.com/courses/965721/assignments/6050536)
 
 
-__Deadlines:__  April 18th, 2025 at 11:59 PM EST (10 days from the release of the assignment). Release Date: April 10th, 2025 at 11.59 PM EST. Late Due date: May 10th, 2025 at 11.59 PM EST.
+__Deadlines:__  April 18th, 2025 at 11:59 PM EST (10 days from the release of the assignment). 
+__Release Date:__  April 10th, 2025 at 11.59 PM EST. 
+__Late Due Date:__ May 10th, 2025 at 11.59 PM EST.
 
 ## :bar_chart: Evaluation:
 
