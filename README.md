@@ -65,9 +65,10 @@ Consider the following sequence of operations:
 
 For this assignment, you will submit your `Dictionary.java` file and any additional files you create through Gradescope.
 
-__Submission link:__ [https://www.gradescope.com/courses/544834](https://www.gradescope.com/courses/844378)
+__Submission link:__ [https://www.gradescope.com/courses/965721/assignments/6050536](https://www.gradescope.com/courses/965721/assignments/6050536)
 
-__Deadline:__ Dec 9th, 2024 at 11:59 PM EST (2 weeks from the release of the assignment).
+
+__Deadlines:__  April 18th, 2025 at 11:59 PM EST (10 days from the release of the assignment). Release Date: April 10th, 2025 at 11.59 PM EST. Late Due date: May 10th, 2025 at 11.59 PM EST.
 
 ## :bar_chart: Evaluation:
 
@@ -75,7 +76,7 @@ __Deadline:__ Dec 9th, 2024 at 11:59 PM EST (2 weeks from the release of the ass
 
 - __Initialization:__ The `Dictionary` object is initialized with no words.
 - __Operations:__ The methods can be invoked in any arbitrary order, as long as they are valid.
-- __Testing:__ We will test your implementation with various test cases, each containing different sequences of operations. Based on how many and which test cases your implementation passes, we will assign you a score between 0 and 25 points.
+- __Testing:__ We will test your implementation with various test cases, each containing different sequences of operations. Based on how many and which test cases your implementation passes, we will assign you a score between 0 and 25 points. 
 
 ### Criteria
 
@@ -85,7 +86,7 @@ __Deadline:__ Dec 9th, 2024 at 11:59 PM EST (2 weeks from the release of the ass
 
 ## :rocket: Starter Code
 
-Begin your quest with this [`Dictionary.java`](TaskPrioritizer.java) file. Make sure to adhere to the requirements and constraints provided in the problem description, and do not use any disallowed Java standard collection libraries.
+Begin your quest with this [`Dictionary.java`](Dictionary.java) file. Make sure to adhere to the requirements and constraints provided in the problem description, and do not use any disallowed Java standard collection libraries.
 
 ### Evaluation Script
 
