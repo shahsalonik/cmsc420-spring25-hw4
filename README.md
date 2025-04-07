@@ -72,6 +72,9 @@ __Deadlines:__  April 18th, 2025 at 11:59 PM EST (10 days from the release of th
 __Release Date:__  April 10th, 2025 at 11.59 PM EST. 
 __Late Due Date:__ May 10th, 2025 at 11.59 PM EST.
 
+__Submission Grading:__ Bonus points (+5) will be awarded for submissions that pass all the provided public test cases.
+
+
 ## :bar_chart: Evaluation:
 
 ### Procedure
