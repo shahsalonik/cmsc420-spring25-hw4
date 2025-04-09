@@ -69,7 +69,7 @@ __Submission link:__ [https://www.gradescope.com/courses/965721/assignments/6050
 
 
 __Deadlines:__  April 19th, 2025 at 11:59 PM EST (10 days from the release of the assignment). 
-__Release Date:__  April 9th, 2025 at 11.59 PM EST
+__Release Date:__  April 9th, 2025 at 11:59 PM EST
 __Late Due Date:__ May 10th, 2025 at 11.59 PM EST
 
 
