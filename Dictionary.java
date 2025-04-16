@@ -1,30 +1,29 @@
-import java.lang.String;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Dictionary class that stores words and associates them with their definitions
- */
 public class Dictionary {
-
-    // class for the TrieNode that stores the definition and its children
     private static class TrieNode {
         TrieNode[] children = new TrieNode[26];
         boolean isWord;
         String definition;
         int subtreeCount;
 
-        // Returns number of non-null children
         int childCount() {
             int count = 0;
-            for (TrieNode n : children) if (n != null) count++;
+            for (TrieNode n : children) {
+                if (n != null && n.subtreeCount > 0) {
+                    count++;
+                }
+            }
             return count;
         }
 
-        // Returns index of the only child; call only if childCount() == 1
         int getOnlyChildIndex() {
             for (int i = 0; i < 26; i++) {
-                if (children[i] != null) return i;
+                TrieNode n = children[i];
+                if (n != null && n.subtreeCount > 0) {
+                    return i;
+                }
             }
             return -1;
         }
@@ -35,14 +34,13 @@ public class Dictionary {
         boolean isWord;
         String definition;
         int subtreeCount;
-        List<CompressedNode> children;
+        List<CompressedNode> children = new ArrayList<>();
 
         CompressedNode(String segment, boolean isWord, String definition, int subtreeCount) {
             this.segment = segment;
             this.isWord = isWord;
             this.definition = definition;
             this.subtreeCount = subtreeCount;
-            this.children = new ArrayList<>();
         }
     }
 
@@ -68,7 +66,7 @@ public class Dictionary {
      */
     public void add(String word, String definition) {
         if (compressed) {
-            throw new IllegalStateException("Cannot add after compress");
+            return;
         }
         TrieNode curr = root;
         List<TrieNode> path = new ArrayList<>();
@@ -81,11 +79,8 @@ public class Dictionary {
             curr = curr.children[idx];
             path.add(curr);
         }
-        // If new word, update subtree counts
         if (!curr.isWord) {
-            for (TrieNode node : path) {
-                node.subtreeCount++;
-            }
+            for (TrieNode node : path) node.subtreeCount++;
         }
         curr.isWord = true;
         curr.definition = definition;
@@ -98,7 +93,7 @@ public class Dictionary {
      */
     public void remove(String word) {
         if (compressed) {
-            throw new IllegalStateException("Cannot remove after compress");
+            return;
         }
         TrieNode curr = root;
         List<TrieNode> path = new ArrayList<>();
@@ -106,15 +101,14 @@ public class Dictionary {
         for (char ch : word.toCharArray()) {
             int idx = ch - 'a';
             if (curr.children[idx] == null) {
-                return;  // Word not present
+                return;
             }
             curr = curr.children[idx];
             path.add(curr);
         }
         if (!curr.isWord) {
-            return;  // Not a word
+            return;
         }
-        // Unmark and decrement counts
         curr.isWord = false;
         curr.definition = null;
         for (TrieNode node : path) {
@@ -137,43 +131,11 @@ public class Dictionary {
                 if (curr.children[idx] == null) return null;
                 curr = curr.children[idx];
             }
-            return curr.isWord ? curr.definition : null;
-        } else {
-            // Compressed lookup
-            CompressedNode curr = cRoot;
-            int pos = 0;
-            while (pos < word.length()) {
-                boolean found = false;
-                for (CompressedNode child : curr.children) {
-                    String seg = child.segment;
-                    if (word.startsWith(seg, pos)) {
-                        pos += seg.length();
-                        curr = child;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) return null;
+            if(curr.isWord) {
+                return curr.definition;
             }
-            return curr.isWord ? curr.definition : null;
+            return null;
         }
-    }
-
-    /**
-     * A method to get a string representation of the sequence of nodes which would
-     * store the word
-     * in a compressed trie consisting of all words in the dictionary
-     * Returns null if the word is not in the dictionary
-     *
-     * @param word The word we want the sequence for
-     * @return The sequence representation, or null if word not found
-     */
-    // Returns the compressed representation of the sequence of nodes that stores the word
-    public String getSequence(String word) {
-        if (!compressed) {
-            throw new IllegalStateException("Must compress before getSequence");
-        }
-        List<String> parts = new ArrayList<>();
         CompressedNode curr = cRoot;
         int pos = 0;
         while (pos < word.length()) {
@@ -181,16 +143,21 @@ public class Dictionary {
             for (CompressedNode child : curr.children) {
                 String seg = child.segment;
                 if (word.startsWith(seg, pos)) {
-                    parts.add(seg);
                     pos += seg.length();
                     curr = child;
                     found = true;
                     break;
                 }
             }
-            if (!found) return null;
+            if (!found) {
+                return null;
+            }
         }
-        return String.join("-", parts);
+
+        if(curr.isWord) {
+            return curr.definition;
+        }
+        return null;
     }
 
     /**
@@ -208,42 +175,31 @@ public class Dictionary {
                 curr = curr.children[idx];
             }
             return curr.subtreeCount;
-        } else {
-            // Compressed count
-            CompressedNode curr = cRoot;
-            int pos = 0;
-            if (prefix.length() == 0) return curr.subtreeCount;
-            while (pos < prefix.length()) {
-                boolean found = false;
-                String rem = prefix.substring(pos);
-                for (CompressedNode child : curr.children) {
-                    String seg = child.segment;
-                    if (rem.startsWith(seg)) {
-                        pos += seg.length();
-                        curr = child;
-                        found = true;
-                        if (pos == prefix.length()) {
-                            return curr.subtreeCount;
-                        }
-                        break;
-                    } else if (seg.startsWith(rem)) {
-                        // Prefix ends in middle of segment
-                        return child.subtreeCount;
-                    }
-                }
-                if (!found) return 0;
-            }
+        }
+        CompressedNode curr = cRoot;
+        int pos = 0;
+        if (prefix.isEmpty()) {
             return curr.subtreeCount;
         }
-    }
-
-    private int countWords(TrieNode node) {
-        if (node == null) return 0;
-        int count = node.definition != null ? 1 : 0;
-        for (TrieNode child : node.children) {
-            count += countWords(child);
+        while (pos < prefix.length()) {
+            boolean found = false;
+            String rem = prefix.substring(pos);
+            for (CompressedNode child : curr.children) {
+                String seg = child.segment;
+                if (rem.startsWith(seg)) {
+                    pos += seg.length();
+                    curr = child;
+                    found = true;
+                    break;
+                } else if (seg.startsWith(rem)) {
+                    return child.subtreeCount;
+                }
+            }
+            if (!found) {
+                return 0;
+            }
         }
-        return count;
+        return curr.subtreeCount;
     }
 
     /**
@@ -251,7 +207,9 @@ public class Dictionary {
      * This operation should not change the behavior of any other methods
      */
     public void compress() {
-        if (compressed) return;
+        if (compressed) {
+            return;
+        }
         this.cRoot = new CompressedNode("", false, null, root.subtreeCount);
         for (int i = 0; i < 26; i++) {
             if (root.children[i] != null) {
@@ -259,21 +217,54 @@ public class Dictionary {
                 cRoot.children.add(compressEdge(root.children[i], String.valueOf(ch)));
             }
         }
-        this.root = null;  // Free uncompressed trie
+        this.root = null;
         this.compressed = true;
     }
 
+    /**
+     * A method to get a string representation of the sequence of nodes which would
+     * store the word
+     * in a compressed trie consisting of all words in the dictionary
+     * Returns null if the word is not in the dictionary
+     *
+     * @param word The word we want the sequence for
+     * @return The sequence representation, or null if word not found
+     */
+    public String getSequence(String word) {
+        if (!compressed) {
+            return null;
+        }
+        List<String> parts = new ArrayList<>();
+        CompressedNode curr = cRoot;
+        int pos = 0;
+        while (pos < word.length()) {
+            boolean found = false;
+            for (CompressedNode child : curr.children) {
+                String seg = child.segment;
+                if (word.startsWith(seg, pos)) {
+                    parts.add(seg);
+                    pos += seg.length();
+                    curr = child;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return null;
+            }
+        }
+        return String.join("-", parts);
+    }
+
     private CompressedNode compressEdge(TrieNode node, String prefix) {
-        // Extend as long as single child & not end-of-word
         TrieNode curr = node;
         StringBuilder sb = new StringBuilder(prefix);
-        while (!curr.isWord && curr.childCount() == 1) {
+        while (curr.childCount() == 1) {
             int idx = curr.getOnlyChildIndex();
             sb.append((char) ('a' + idx));
             curr = curr.children[idx];
         }
         CompressedNode cnode = new CompressedNode(sb.toString(), curr.isWord, curr.definition, curr.subtreeCount);
-        // Recurse for remaining children
         for (int i = 0; i < 26; i++) {
             if (curr.children[i] != null) {
                 char ch = (char) ('a' + i);
@@ -282,5 +273,4 @@ public class Dictionary {
         }
         return cnode;
     }
-
 }
