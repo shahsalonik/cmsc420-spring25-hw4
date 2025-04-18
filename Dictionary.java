@@ -1,14 +1,18 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Dictionary class that stores words and associates them with their definitions
+ */
 public class Dictionary {
-    private static class TrieNode {
+
+    private class TrieNode {
         TrieNode[] children = new TrieNode[26];
         boolean isWord;
         String definition;
         int subtreeCount;
 
-        int childCount() {
+        public int childCount() {
             int count = 0;
             for (TrieNode n : children) {
                 if (n != null && n.subtreeCount > 0) {
@@ -18,18 +22,16 @@ public class Dictionary {
             return count;
         }
 
-        int getOnlyChildIndex() {
+        public int getOnlyChildIndex() {
             for (int i = 0; i < 26; i++) {
                 TrieNode n = children[i];
-                if (n != null && n.subtreeCount > 0) {
-                    return i;
-                }
+                if (n != null && n.subtreeCount > 0) return i;
             }
             return -1;
         }
     }
 
-    private static class CompressedNode {
+    private class CompressedNode {
         String segment;
         boolean isWord;
         String definition;
@@ -153,11 +155,50 @@ public class Dictionary {
                 return null;
             }
         }
-
         if(curr.isWord) {
             return curr.definition;
         }
         return null;
+    }
+    
+    /**
+     * A method to get a string representation of the sequence of nodes which would
+     * store the word
+     * in a compressed trie consisting of all words in the dictionary
+     * Returns null if the word is not in the dictionary
+     *
+     * @param word The word we want the sequence for
+     * @return The sequence representation, or null if word not found
+     */
+    public String getSequence(String word) {
+        if (!compressed) {
+            return null;
+        }
+        List<String> parts = new ArrayList<>();
+        CompressedNode curr = cRoot;
+        int pos = 0;
+    
+        while (pos < word.length()) {
+            boolean found = false;
+            for (CompressedNode child : curr.children) {
+                String seg = child.segment;
+                if (word.startsWith(seg, pos)) {
+                    parts.add(seg);
+                    pos += seg.length();
+                    curr = child;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) 
+                return null;
+        }
+    
+        if (!curr.isWord) {
+            return null;
+        }
+    
+        return String.join("-", parts);
     }
 
     /**
@@ -211,66 +252,38 @@ public class Dictionary {
             return;
         }
         this.cRoot = new CompressedNode("", false, null, root.subtreeCount);
+        // only descend into subtrees that actually contain words
         for (int i = 0; i < 26; i++) {
-            if (root.children[i] != null) {
-                char ch = (char) ('a' + i);
-                cRoot.children.add(compressEdge(root.children[i], String.valueOf(ch)));
+            TrieNode child = root.children[i];
+            if (child != null && child.subtreeCount > 0) {
+                char ch = (char)('a' + i);
+                cRoot.children.add(compressEdge(child, String.valueOf(ch)));
             }
         }
         this.root = null;
         this.compressed = true;
     }
-
-    /**
-     * A method to get a string representation of the sequence of nodes which would
-     * store the word
-     * in a compressed trie consisting of all words in the dictionary
-     * Returns null if the word is not in the dictionary
-     *
-     * @param word The word we want the sequence for
-     * @return The sequence representation, or null if word not found
-     */
-    public String getSequence(String word) {
-        if (!compressed) {
-            return null;
-        }
-        List<String> parts = new ArrayList<>();
-        CompressedNode curr = cRoot;
-        int pos = 0;
-        while (pos < word.length()) {
-            boolean found = false;
-            for (CompressedNode child : curr.children) {
-                String seg = child.segment;
-                if (word.startsWith(seg, pos)) {
-                    parts.add(seg);
-                    pos += seg.length();
-                    curr = child;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return null;
-            }
-        }
-        return String.join("-", parts);
-    }
-
+    
     private CompressedNode compressEdge(TrieNode node, String prefix) {
         TrieNode curr = node;
         StringBuilder sb = new StringBuilder(prefix);
-        while (curr.childCount() == 1) {
+    
+        // merge until curr is not the end of a word and curr has 1 nonempty child
+        while (!curr.isWord && curr.childCount() == 1) {
             int idx = curr.getOnlyChildIndex();
-            sb.append((char) ('a' + idx));
+            sb.append((char)('a' + idx));
             curr = curr.children[idx];
         }
-        CompressedNode cnode = new CompressedNode(sb.toString(), curr.isWord, curr.definition, curr.subtreeCount);
+    
+        CompressedNode merge = new CompressedNode(sb.toString(), curr.isWord, curr.definition, curr.subtreeCount);
+    
         for (int i = 0; i < 26; i++) {
-            if (curr.children[i] != null) {
-                char ch = (char) ('a' + i);
-                cnode.children.add(compressEdge(curr.children[i], String.valueOf(ch)));
+            TrieNode child = curr.children[i];
+            if (child != null && child.subtreeCount > 0) {
+                char ch = (char)('a' + i);
+                merge.children.add(compressEdge(child, String.valueOf(ch)));
             }
         }
-        return cnode;
+        return merge;
     }
 }
